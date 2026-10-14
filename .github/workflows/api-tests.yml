@@ -1,0 +1,48 @@
+
+name: API Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    name: Smoke Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar smoke tests
+        run: npx playwright test tests/auth/login.spec.ts --grep "@smoke"
+
+  regression:
+    name: API Regression Tests
+    needs: smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar regresion
+        run: npx playwright test tests/auth/login.spec.ts
